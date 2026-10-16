@@ -93,3 +93,4 @@ export const rateLimitBucket = pgTable('rate_limit_bucket', {
   count: integer('count').notNull().default(0),
   windowStartedAt: timestamp('windowStartedAt').notNull().defaultNow(),
 })
+
