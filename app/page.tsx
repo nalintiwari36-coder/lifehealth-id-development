@@ -48,7 +48,7 @@ export default function Page() {
             {navItems.map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} className="transition-colors hover:text-[#123f62]">{item}</a>)}
           </nav>
           <div className="hidden items-center gap-3 sm:flex">
-            <button className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Sign in</button>
+            <a href="/sign-in" className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Sign in</a>
             <button onClick={() => setShowDashboard(true)} className="rounded-full bg-[#123f62] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#123f62]/15 transition-transform hover:-translate-y-0.5">Create your ID <ArrowRight className="ml-1 inline" size={15} /></button>
           </div>
           <button aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)} className="rounded-lg p-2 lg:hidden"><Menu size={22} /></button>
