@@ -32,25 +32,47 @@
 
 :root {
   color-scheme: light;
-  --background: oklch(0.985 0.004 245);
-  --foreground: oklch(0.22 0.035 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.035 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.035 240);
-  --primary: oklch(0.32 0.09 240);
-  --primary-foreground: oklch(0.99 0.005 240);
-  --secondary: oklch(0.95 0.025 180);
-  --secondary-foreground: oklch(0.32 0.08 185);
-  --muted: oklch(0.95 0.01 240);
-  --muted-foreground: oklch(0.52 0.025 240);
-  --accent: oklch(0.94 0.035 180);
-  --accent-foreground: oklch(0.32 0.08 185);
-  --destructive: oklch(0.57 0.18 25);
-  --border: oklch(0.9 0.018 240);
-  --input: oklch(0.9 0.018 240);
-  --ring: oklch(0.59 0.12 185);
-  --radius: 0.75rem;
+  --background: oklch(0.98 0.008 185);
+  --foreground: oklch(0.23 0.035 220);
+  --card: oklch(1 0.002 180);
+  --card-foreground: oklch(0.23 0.035 220);
+  --popover: oklch(1 0.002 180);
+  --popover-foreground: oklch(0.23 0.035 220);
+  --primary: oklch(0.31 0.075 225);
+  --primary-foreground: oklch(0.99 0.005 180);
+  --secondary: oklch(0.91 0.045 180);
+  --secondary-foreground: oklch(0.33 0.08 180);
+  --muted: oklch(0.945 0.012 210);
+  --muted-foreground: oklch(0.5 0.03 220);
+  --accent: oklch(0.72 0.12 180);
+  --accent-foreground: oklch(0.28 0.07 180);
+  --destructive: oklch(0.55 0.18 25);
+  --border: oklch(0.88 0.02 210);
+  --input: oklch(0.88 0.02 210);
+  --ring: oklch(0.58 0.12 180);
+  --radius: 0.85rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.16 0.025 220);
+  --foreground: oklch(0.94 0.02 185);
+  --card: oklch(0.2 0.03 220);
+  --card-foreground: oklch(0.94 0.02 185);
+  --popover: oklch(0.2 0.03 220);
+  --popover-foreground: oklch(0.94 0.02 185);
+  --primary: oklch(0.72 0.1 185);
+  --primary-foreground: oklch(0.15 0.025 220);
+  --secondary: oklch(0.28 0.05 185);
+  --secondary-foreground: oklch(0.88 0.06 180);
+  --muted: oklch(0.24 0.028 220);
+  --muted-foreground: oklch(0.72 0.025 210);
+  --accent: oklch(0.68 0.12 180);
+  --accent-foreground: oklch(0.15 0.025 220);
+  --destructive: oklch(0.72 0.14 25);
+  --border: oklch(0.34 0.04 220);
+  --input: oklch(0.34 0.04 220);
+  --ring: oklch(0.72 0.1 185);
 }
 
 @layer base {
@@ -74,4 +96,8 @@
 .dashboard-header { box-shadow: 0 10px 30px rgba(18, 63, 98, .08); }
 .brand-orb { box-shadow: 0 0 0 4px rgba(16, 155, 148, .12), 0 0 24px rgba(16, 155, 148, .28); }
 button, a { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible { outline: 3px solid oklch(0.66 0.13 185); outline-offset: 3px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
+.eyebrow { color: var(--secondary-foreground); font-size: .7rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.tool-card { border: 1px solid var(--border); border-radius: 1.5rem; background: var(--card); padding: 1.5rem; box-shadow: 0 18px 45px color-mix(in oklch, var(--primary) 7%, transparent); }
+@media (min-width: 640px) { .tool-card { padding: 1.75rem; } }
+.dark .tool-card { box-shadow: 0 18px 45px rgb(0 0 0 / 18%); }
