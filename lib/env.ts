@@ -12,7 +12,22 @@ const positiveInteger = (name: string, value: string | undefined, fallback: numb
 }
 
 const databaseUrl = required('DATABASE_URL', process.env.DATABASE_URL)
-const betterAuthSecret = required('BETTER_AUTH_SECRET', process.env.BETTER_AUTH_SECRET)
+
+const validateBetterAuthSecret = (value: string | undefined) => {
+  const secret = required('BETTER_AUTH_SECRET', value)
+  const placeholders = new Set([
+    'replace-with-a-32-plus-character-random-value',
+    'your-secret-here',
+    'changeme',
+    'change-me',
+  ])
+  if (secret.length < 32 || placeholders.has(secret.toLowerCase())) {
+    throw new Error('Invalid BETTER_AUTH_SECRET: use a unique random value with at least 32 characters')
+  }
+  return secret
+}
+
+const betterAuthSecret = validateBetterAuthSecret(process.env.BETTER_AUTH_SECRET)
 const betterAuthUrl = process.env.BETTER_AUTH_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` :
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.V0_RUNTIME_URL)
