@@ -2,9 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import {
-  Activity, ArrowRight, Check, ChevronDown, CircleHelp, FileText, HeartPulse, Languages,
-  LockKeyhole, Menu, QrCode, Search, ShieldCheck, Sparkles, Stethoscope, Upload, UserRound,
-  UsersRound, X,
+  Activity, ArrowRight, Check, ChevronDown, CircleHelp, FileText, HeartPulse, LockKeyhole, Menu, Moon,
+  QrCode, Search, ShieldCheck, Sparkles, Stethoscope, Sun, Upload, UserRound, UsersRound, X,
 } from 'lucide-react'
 
 type RecordType = 'Lab report' | 'Prescription' | 'Visit note'
@@ -27,7 +26,21 @@ const questions = {
 
 export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
   const [language, setLanguage] = useState<'English' | 'हिन्दी'>('English')
+  const hindi = language === 'हिन्दी'
+  const copy = hindi ? {
+    mission: 'मिशन', how: 'कैसे काम करता है', doctors: 'डॉक्टरों के लिए', trust: 'विश्वास और गोपनीयता',
+    demo: 'डेमो देखें', headline: 'आपकी स्वास्थ्य कहानी, हमेशा आपके साथ।',
+    intro: 'आपके मेडिकल रिकॉर्ड के लिए एक सुरक्षित, आजीवन घर। सभी के लिए निःशुल्क, ताकि देखभाल अधिक जुड़ी, सरल और मानवीय हो।',
+    explore: 'लाइव डेमो देखें', howCta: 'कैसे काम करता है देखें',
+  } : {
+    mission: 'Mission', how: 'How it works', doctors: 'For doctors', trust: 'Trust & privacy',
+    demo: 'Try the demo', headline: 'Your health story, always with you.',
+    intro: 'One secure, lifelong home for your medical records. Free for everyone, designed to make care more connected, understandable, and human.',
+    explore: 'Explore the live demo', howCta: 'See how it works',
+  }
+  const toggleTheme = () => { document.documentElement.classList.toggle('dark'); setDarkMode((value) => !value) }
   const [showDemo, setShowDemo] = useState(false)
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'All' | RecordType>('All')
@@ -49,16 +62,16 @@ export default function Page() {
       <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <a href="#top" className="flex items-center gap-2.5" aria-label="LifeHealth ID home"><span className="brand-orb flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground"><HeartPulse size={19} /></span><span className="text-[17px] font-semibold tracking-[-.03em]">LifeHealth <span className="text-secondary-foreground">ID</span></span></a>
-          <nav className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">{['Mission', 'How it works', 'For doctors', 'Trust & privacy'].map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} className="hover:text-foreground">{item}</a>)}</nav>
-          <div className="hidden items-center gap-2 sm:flex"><label className="sr-only" htmlFor="language">Language</label><select id="language" value={language} onChange={(e) => setLanguage(e.target.value as typeof language)} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium"><option>English</option><option>हिन्दी</option></select><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:-translate-y-0.5">Try the demo <ArrowRight className="ml-1 inline" size={15} /></button></div>
-          <button className="rounded-lg p-2 lg:hidden" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button>
+          <nav className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">{[[copy.mission, 'mission'], [copy.how, 'how-it-works'], [copy.doctors, 'for-doctors'], [copy.trust, 'trust-&-privacy']].map(([label, href]) => <a key={href} href={`#${href}`} className="hover:text-foreground">{label}</a>)}</nav>
+          <div className="hidden items-center gap-2 sm:flex"><label className="sr-only" htmlFor="language">Language</label><select id="language" value={language} onChange={(e) => setLanguage(e.target.value as typeof language)} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium"><option>English</option><option>हिन्दी</option></select><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:-translate-y-0.5">{copy.demo} <ArrowRight className="ml-1 inline" size={15} /></button></div>
+          <div className="flex items-center gap-2 lg:hidden"><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button className="rounded-lg p-2" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button></div>
         </div>
         {menuOpen && <nav className="flex flex-col gap-4 border-t border-border px-5 py-5 text-sm lg:hidden">{['Mission', 'How it works', 'For doctors', 'Trust & privacy'].map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} onClick={() => setMenuOpen(false)}>{item}</a>)}<button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-3 font-semibold text-primary-foreground">Try the demo</button></nav>}
       </header>
 
       {/* Hero with live dashboard preview */}
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-20 lg:grid-cols-[.95fr_1.05fr] lg:px-8 lg:pb-28 lg:pt-28">
-        <div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/50 px-3.5 py-2 text-xs font-semibold text-secondary-foreground"><span className="size-2 rounded-full bg-accent-foreground" /> A public-benefit health platform</div><h1 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-[-.065em] text-primary sm:text-6xl lg:text-[72px]">Your health story, <span className="text-secondary-foreground">always with you.</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">One secure, lifelong home for your medical records. Free for everyone, designed to make care more connected, understandable, and human.</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/20">Explore the live demo <ArrowRight className="ml-1 inline" size={16} /></button><a href="#how-it-works" className="rounded-full border border-border bg-card px-6 py-3.5 text-center text-sm font-semibold text-primary hover:bg-muted">See how it works</a></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-medium text-muted-foreground"><span><ShieldCheck className="mr-2 inline text-secondary-foreground" size={16} />Private by design</span><span><LockKeyhole className="mr-2 inline text-secondary-foreground" size={15} />You control access</span><span><Check className="mr-2 inline text-secondary-foreground" size={16} />Always free</span></div></div>
+        <div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/50 px-3.5 py-2 text-xs font-semibold text-secondary-foreground"><span className="size-2 rounded-full bg-accent-foreground" /> A public-benefit health platform</div><h1 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-[-.065em] text-primary sm:text-6xl lg:text-[72px]">{copy.headline.split(', ')[0]}, <span className="text-secondary-foreground">{copy.headline.split(', ')[1]}</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">{copy.intro}</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/20">{copy.explore} <ArrowRight className="ml-1 inline" size={16} /></button><a href="#how-it-works" className="rounded-full border border-border bg-card px-6 py-3.5 text-center text-sm font-semibold text-primary hover:bg-muted">{copy.howCta}</a></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-medium text-muted-foreground"><span><ShieldCheck className="mr-2 inline text-secondary-foreground" size={16} />Private by design</span><span><LockKeyhole className="mr-2 inline text-secondary-foreground" size={15} />You control access</span><span><Check className="mr-2 inline text-secondary-foreground" size={16} />Always free</span></div></div>
         <DashboardPreview onOpen={() => setShowDemo(true)} />
       </section>
 
