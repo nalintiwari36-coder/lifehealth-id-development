@@ -65,5 +65,13 @@
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
+.dashboard-shell { background-image: radial-gradient(circle at 15% 10%, rgba(88, 220, 208, .12), transparent 28rem), radial-gradient(circle at 90% 20%, rgba(43, 108, 163, .1), transparent 24rem); }
+.dashboard-shell section, .dashboard-shell aside > div { box-shadow: 0 18px 45px rgba(18, 63, 98, .06), inset 0 1px rgba(255,255,255,.7); transition: transform .35s ease, box-shadow .35s ease, background-color .35s ease; }
+.dashboard-shell section:hover, .dashboard-shell aside > div:hover { transform: perspective(900px) rotateX(1deg) translateY(-3px); box-shadow: 0 24px 55px rgba(18, 63, 98, .12), inset 0 1px rgba(255,255,255,.8); }
+.dark .dashboard-shell { background-image: radial-gradient(circle at 12% 8%, rgba(42, 212, 198, .14), transparent 26rem), radial-gradient(circle at 88% 18%, rgba(70, 119, 255, .16), transparent 25rem); }
+.dark .dashboard-shell section, .dark .dashboard-shell aside > div { border-color: rgba(91, 132, 160, .28); background-color: rgba(12, 31, 47, .86); box-shadow: 0 22px 60px rgba(0,0,0,.24), inset 0 1px rgba(148, 213, 230, .1); }
+.dark .dashboard-shell section:hover, .dark .dashboard-shell aside > div:hover { box-shadow: 0 28px 70px rgba(0,0,0,.36), inset 0 1px rgba(148, 213, 230, .16); }
+.dashboard-header { box-shadow: 0 10px 30px rgba(18, 63, 98, .08); }
+.brand-orb { box-shadow: 0 0 0 4px rgba(16, 155, 148, .12), 0 0 24px rgba(16, 155, 148, .28); }
 button, a { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible { outline: 3px solid oklch(0.66 0.13 185); outline-offset: 3px; }

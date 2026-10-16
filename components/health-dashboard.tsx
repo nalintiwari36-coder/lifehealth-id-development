@@ -12,7 +12,9 @@ import {
   HeartPulse,
   LockKeyhole,
   MoreHorizontal,
+  Moon,
   Search,
+  Sun,
   ShieldCheck,
   Sparkles,
   Stethoscope,
@@ -34,7 +36,7 @@ export function HealthDashboard({ name }: { name: string }) {
   const firstName = name.split(' ')[0]
 
   return (
-    <div className="grid min-h-[calc(100vh-73px)] lg:grid-cols-[230px_1fr]">
+    <div className="dashboard-shell grid min-h-[calc(100vh-73px)] bg-[#f8fafc] text-[#123f62] transition-colors duration-500 dark:bg-[#071522] dark:text-slate-100 lg:grid-cols-[230px_1fr]">
       <aside className="hidden border-r border-slate-200 bg-white p-5 lg:block">
         <nav className="flex flex-col gap-1.5" aria-label="Dashboard navigation">
           {[
@@ -70,7 +72,7 @@ function StatCard({ icon: Icon, value, label }: { icon: typeof FileText; value: 
 function RecordRow({ title, type, date, status, tone, onExplain }: { title: string; type: string; date: string; status: string; tone: string; onExplain: () => void }) { return <div className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3.5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><div className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${tone === 'teal' ? 'bg-[#e5f6f4] text-[#109b94]' : tone === 'gold' ? 'bg-[#fff5dc] text-[#b57b1b]' : 'bg-[#e8f0fa] text-[#2b6ca3]'}`}><FileText size={17} /></div><div><p className="text-sm font-semibold text-[#123f62]">{title}</p><p className="mt-0.5 text-xs text-slate-500">{type} · {date}</p></div></div><div className="flex items-center gap-2 pl-12 sm:pl-0"><span className="text-[11px] font-medium text-slate-500">{status}</span><button onClick={onExplain} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] font-semibold text-[#146f6a] hover:bg-[#f0fbfa]">Explain</button></div></div> }
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) { return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#123f62]/25 p-5 backdrop-blur-sm"><div role="dialog" aria-modal="true" className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"><div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-[#123f62]">{title}</h2><button onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-slate-400 hover:bg-slate-50">×</button></div><div className="mt-5">{children}</div></div></div> }
 
-export function DashboardHeader({ onSignOut }: { onSignOut: React.ReactNode }) { return <header className="border-b border-slate-200 bg-white"><div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 py-4 sm:px-8"><div className="flex items-center gap-2 font-semibold text-[#123f62]"><span className="flex size-8 items-center justify-center rounded-lg bg-[#123f62] text-white"><HeartPulse size={17} /></span> LifeHealth <span className="text-[#109b94]">ID</span></div><div className="flex items-center gap-4"><div className="hidden items-center gap-2 text-xs text-slate-500 sm:flex"><CheckCircle2 size={15} className="text-[#109b94]" /> Protected session</div>{onSignOut}</div></div></header> }
+export function DashboardHeader({ onSignOut }: { onSignOut: React.ReactNode }) { const [darkMode, setDarkMode] = useState(false); const toggleTheme = () => { const next = !darkMode; setDarkMode(next); document.documentElement.classList.toggle('dark', next) }; return <header className="dashboard-header border-b border-slate-200 bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-[#071522]/90"><div className="mx-auto flex max-w-[1400px] items-center justify-between px-5 py-4 sm:px-8"><div className="flex items-center gap-2 font-semibold text-[#123f62] dark:text-slate-100"><span className="brand-orb flex size-8 items-center justify-center rounded-lg bg-[#123f62] text-white"><HeartPulse size={17} /></span> LifeHealth <span className="text-[#109b94]">ID</span></div><div className="flex items-center gap-3"><button type="button" aria-label="Toggle light and dark mode" onClick={toggleTheme} className="theme-toggle rounded-full border border-slate-200 bg-white p-2 text-[#123f62] shadow-sm transition hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-900 dark:text-cyan-300">{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><div className="hidden items-center gap-2 text-xs text-slate-500 sm:flex"><CheckCircle2 size={15} className="text-[#109b94]" /> Protected session</div>{onSignOut}</div></div></header> }
 export function MobileSearch() { return <div className="mb-5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-400 lg:hidden"><Search size={16} /> Search your records</div> }
 export function CalendarIcon() { return <CalendarDays size={18} /> }
 export function HealthIcon() { return <HeartPulse size={18} /> }
