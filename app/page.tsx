@@ -50,7 +50,7 @@ export default function Page() {
   const [doctor, setDoctor] = useState('Dr. Maya Chen')
   const [expiry, setExpiry] = useState('7 days')
   const [shared, setShared] = useState(false)
-  const [visible, setVisible] = useState({ blood: true, allergies: true, medicines: true, contact: true })
+  const [visible, setVisible] = useState<Record<string, boolean>>({ blood: true, allergies: true, medicines: true, contact: true })
   const [chosen, setChosen] = useState<string[]>([])
 
   const filteredRecords = useMemo(() => records.filter((record) => (filter === 'All' || record.type === filter) && `${record.title} ${record.source}`.toLowerCase().includes(query.toLowerCase())), [filter, query])
