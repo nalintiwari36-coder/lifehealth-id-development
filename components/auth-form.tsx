@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth-client'
 export function AuthForm() {
   const router = useRouter()
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
+  const [role, setRole] = useState<'patient' | 'doctor'>('patient')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -30,14 +31,13 @@ export function AuthForm() {
     router.refresh()
   }
 
-  return (
-    <form onSubmit={submit} className="flex flex-col gap-5">
-      {mode === 'sign-up' && <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Full name<input required value={name} onChange={(event) => setName(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="name" /></label>}
-      <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Email<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="email" /></label>
-      <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Password<input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'} /></label>
-      {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-      <button disabled={pending} className="rounded-full bg-[#123f62] px-5 py-3.5 font-semibold text-white disabled:opacity-60">{pending ? 'Working…' : mode === 'sign-in' ? 'Sign in securely' : 'Create my health ID'}</button>
-      <button type="button" onClick={() => { setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in'); setError('') }} className="text-sm font-medium text-[#146f6a]">{mode === 'sign-in' ? 'New here? Create a free ID' : 'Already have an ID? Sign in'}</button>
-    </form>
-  )
+  return <form onSubmit={submit} className="flex flex-col gap-5">
+    {mode === 'sign-up' && <fieldset className="flex flex-col gap-2"><legend className="text-sm font-medium text-slate-700">I am registering as</legend><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => setRole('patient')} className={`rounded-xl border px-3 py-3 text-sm font-semibold ${role === 'patient' ? 'border-[#109b94] bg-[#f0fbfa] text-[#146f6a]' : 'border-slate-200 text-slate-500'}`}>Patient</button><button type="button" onClick={() => setRole('doctor')} className={`rounded-xl border px-3 py-3 text-sm font-semibold ${role === 'doctor' ? 'border-[#109b94] bg-[#f0fbfa] text-[#146f6a]' : 'border-slate-200 text-slate-500'}`}>Doctor</button></div>{role === 'doctor' && <p className="text-xs leading-5 text-slate-500">Doctor accounts remain pending until credentials are verified by an administrator.</p>}</fieldset>}
+    {mode === 'sign-up' && <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Full name<input required value={name} onChange={(event) => setName(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="name" /></label>}
+    <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Email<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="email" /></label>
+    <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Password<input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'} /></label>
+    {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+    <button disabled={pending} className="rounded-full bg-[#123f62] px-5 py-3.5 font-semibold text-white disabled:opacity-60">{pending ? 'Working…' : mode === 'sign-in' ? 'Sign in securely' : role === 'doctor' ? 'Submit doctor registration' : 'Create patient account'}</button>
+    <button type="button" onClick={() => { setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in'); setError('') }} className="text-sm font-medium text-[#146f6a]">{mode === 'sign-in' ? 'New here? Create a free ID' : 'Already have an ID? Sign in'}</button>
+  </form>
 }
