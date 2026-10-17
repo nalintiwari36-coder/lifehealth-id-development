@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import type { Locale } from '@/lib/i18n'
+import { getMessages, type Locale } from '@/lib/i18n'
 import {
   Activity, ArrowRight, Check, ChevronDown as ChevronDownIcon, CircleHelp, FileText, HeartPulse, LockKeyhole, Menu, Moon,
   QrCode, Search, ShieldCheck, Sparkles, Stethoscope, Sun, Upload, UserRound, UsersRound, X,
@@ -30,18 +30,23 @@ export default function Page({ locale = 'en' }: { locale?: Locale }) {
   const [darkMode, setDarkMode] = useState(false)
 const languageOptions = [{ code: 'en', label: 'English' }, { code: 'hi', label: 'हिन्दी' }, { code: 'es', label: 'Español' }, { code: 'fr', label: 'Français' }, { code: 'ar', label: 'العربية' }, { code: 'pt', label: 'Português' }, { code: 'bn', label: 'বাংলা' }, { code: 'zh', label: '中文' }] as const
  const [language, setLanguage] = useState<Locale>(locale)
- const hindi = language === 'hi'
-  const copy = hindi ? {
-    mission: 'मिशन', how: 'कैसे काम करता है', doctors: 'डॉक्टरों के लिए', trust: 'विश्वास और गोपनीयता',
-    demo: 'डेमो देखें', headline: 'आपकी स्वास्थ्य कहानी, हमेशा आपके साथ।',
-    intro: 'आपके मेडिकल रिकॉर्ड के लिए एक सुरक्षित, आजीवन घर। सभी के लिए निःशुल्क, ताकि देखभाल अधिक जुड़ी, सरल और मानवीय हो।',
-    explore: 'लाइव डेमो देखें', howCta: 'कैसे काम करता है देखें',
-  } : {
-    mission: 'Mission', how: 'How it works', doctors: 'For doctors', trust: 'Trust & privacy',
-    demo: 'Try the demo', headline: 'Your health story, always with you.',
-    intro: 'One secure, lifelong home for your medical records. Free for everyone, designed to make care more connected, understandable, and human.',
-    explore: 'Explore the live demo', howCta: 'See how it works',
+  const messages = getMessages(language)
+  const copy = {
+    mission: messages.navigation.mission,
+    how: messages.navigation.how,
+    doctors: messages.navigation.doctors,
+    trust: messages.navigation.trust,
+    demo: messages.navigation.demo,
+    headline: messages.hero.headline,
+    intro: messages.hero.intro,
+    explore: messages.hero.explore,
+    howCta: messages.hero.how,
+    badge: messages.hero.badge,
+    private: messages.trust.private,
+    control: messages.trust.control,
+    free: messages.trust.free,
   }
+
   const toggleTheme = () => { document.documentElement.classList.toggle('dark'); setDarkMode((value) => !value) }
   const [showDemo, setShowDemo] = useState(false)
   const [query, setQuery] = useState('')
@@ -68,12 +73,12 @@ const languageOptions = [{ code: 'en', label: 'English' }, { code: 'hi', label: 
           <div className="hidden items-center gap-2 sm:flex"><label className="sr-only" htmlFor="language">Language</label><select id="language" value={language} onChange={(e) => { const next = e.target.value as Locale; setLanguage(next); window.location.assign(`/${next}`) }} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium">{languageOptions.map((option) => <option key={option.code} value={option.code}>{option.label}</option>)}</select><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:-translate-y-0.5">{copy.demo} <ArrowRight className="ml-1 inline" size={15} /></button></div>
           <div className="flex items-center gap-2 lg:hidden"><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button className="rounded-lg p-2" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button></div>
         </div>
-        {menuOpen && <nav className="flex flex-col gap-4 border-t border-border px-5 py-5 text-sm lg:hidden">{['Mission', 'How it works', 'For doctors', 'Trust & privacy'].map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} onClick={() => setMenuOpen(false)}>{item}</a>)}<button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-3 font-semibold text-primary-foreground">Try the demo</button></nav>}
+        {menuOpen && <nav className="flex flex-col gap-4 border-t border-border px-5 py-5 text-sm lg:hidden">{[[copy.mission, 'mission'], [copy.how, 'how-it-works'], [copy.doctors, 'for-doctors'], [copy.trust, 'trust-&-privacy']].map(([label, href]) => <a key={href} href={`#${href}`} onClick={() => setMenuOpen(false)}>{label}</a>)}<label className="sr-only" htmlFor="mobile-language">Language</label><select id="mobile-language" value={language} onChange={(e) => { const next = e.target.value as Locale; setLanguage(next); window.location.assign(`/${next}`) }} className="rounded-xl border border-border bg-card px-3 py-2 text-sm"><option value="en">English</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option><option value="pt">Português</option><option value="bn">বাংলা</option><option value="zh">中文</option></select><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-3 font-semibold text-primary-foreground">{copy.demo}</button></nav>}
       </header>
 
       {/* Hero with live dashboard preview */}
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-20 lg:grid-cols-[.95fr_1.05fr] lg:px-8 lg:pb-28 lg:pt-28">
-        <div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/50 px-3.5 py-2 text-xs font-semibold text-secondary-foreground"><span className="size-2 rounded-full bg-accent-foreground" /> A public-benefit health platform</div><h1 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-[-.065em] text-primary sm:text-6xl lg:text-[72px]">{copy.headline.split(', ')[0]}, <span className="text-secondary-foreground">{copy.headline.split(', ')[1]}</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">{copy.intro}</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/20">{copy.explore} <ArrowRight className="ml-1 inline" size={16} /></button><a href="#how-it-works" className="rounded-full border border-border bg-card px-6 py-3.5 text-center text-sm font-semibold text-primary hover:bg-muted">{copy.howCta}</a></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-medium text-muted-foreground"><span><ShieldCheck className="mr-2 inline text-secondary-foreground" size={16} />Private by design</span><span><LockKeyhole className="mr-2 inline text-secondary-foreground" size={15} />You control access</span><span><Check className="mr-2 inline text-secondary-foreground" size={16} />Always free</span></div></div>
+        <div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/50 px-3.5 py-2 text-xs font-semibold text-secondary-foreground"><span className="size-2 rounded-full bg-accent-foreground" /> {copy.badge}</div><h1 className="max-w-2xl text-5xl font-semibold leading-[1.05] tracking-[-.065em] text-primary sm:text-6xl lg:text-[72px]">{copy.headline.split(', ')[0]}, <span className="text-secondary-foreground">{copy.headline.split(', ')[1]}</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">{copy.intro}</p><div className="mt-9 flex flex-col gap-3 sm:flex-row"><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-xl shadow-primary/20">{copy.explore} <ArrowRight className="ml-1 inline" size={16} /></button><a href="#how-it-works" className="rounded-full border border-border bg-card px-6 py-3.5 text-center text-sm font-semibold text-primary hover:bg-muted">{copy.howCta}</a></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-medium text-muted-foreground"><span><ShieldCheck className="mr-2 inline text-secondary-foreground" size={16} />{copy.private}</span><span><LockKeyhole className="mr-2 inline text-secondary-foreground" size={15} />{copy.control}</span><span><Check className="mr-2 inline text-secondary-foreground" size={16} />{copy.free}</span></div></div>
         <DashboardPreview onOpen={() => setShowDemo(true)} />
       </section>
 
