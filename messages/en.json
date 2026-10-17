@@ -6,5 +6,6 @@
   "mission": {"eyebrow": "Our promise", "title": "Healthcare should remember the whole person.", "everyone": "For everyone", "everyoneText": "No paywalls, targeted ads, or selling your health data.", "permission": "By your permission", "permissionText": "You decide who sees what, for how long, and why.", "life": "For life", "lifeText": "A portable record that stays with you across every chapter."},
   "demo": {"eyebrow": "A calmer way to care", "title": "Try the tools, using sample data only.", "description": "Nothing here connects to a real health record. These small demos show how LifeHealth ID could help you stay organized and prepared.", "sample": "Sample data only", "notAdvice": "For preparation only, not medical advice."},
   "legal": {"needsReview": true, "reviewNote": "Medical and legal copy requires qualified human review before release.", "notAdvice": "This is educational information, not a diagnosis or medical advice."},
+  "auth": {"signIn": "Sign in", "signUp": "Sign up", "signOut": "Sign out", "dashboard": "Dashboard", "settings": "Account settings", "openAccount": "Open account menu", "signedOut": "You have been signed out", "incorrectCredentials": "Incorrect email or password", "rateLimited": "Too many attempts. Please wait and try again."},
   "footer": {"tagline": "Free, nonprofit, and built for the long term."}
 }

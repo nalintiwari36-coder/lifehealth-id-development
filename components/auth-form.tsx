@@ -4,9 +4,9 @@ import { FormEvent, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 
-export function AuthForm() {
+export function AuthForm({ returnTo = '/dashboard', initialMode = 'sign-in' }: { returnTo?: string; initialMode?: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
-  const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
+  const [mode, setMode] = useState<'sign-in' | 'sign-up'>(initialMode)
   const [role, setRole] = useState<'patient' | 'doctor'>('patient')
   const [step, setStep] = useState<'details' | 'otp'>('details')
   const [name, setName] = useState('')
@@ -37,8 +37,9 @@ export function AuthForm() {
         const verify = await fetch('/api/otp/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, code }) })
         if (!verify.ok) throw new Error((await verify.json().catch(() => null))?.error ?? 'Enter the six-digit code.')
         const result = mode === 'sign-in' ? await authClient.signIn.email({ email, password }) : await authClient.signUp.email({ name, email, password })
-        if (result.error) throw new Error('We could not complete that request. Check your details and try again.')
-        router.push('/dashboard')
+        if (result.error) { const message = result.error.message?.toLowerCase().includes('rate') || result.error.status === 429 ? 'Too many attempts. Please wait and try again.' : 'Incorrect email or password'; throw new Error(message) }
+        const destination = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/dashboard'
+        router.push(destination)
         router.refresh()
       }
     } catch (cause) {
