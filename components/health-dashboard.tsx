@@ -22,7 +22,11 @@ import {
   UsersRound,
   Mail,
   Send,
+  QrCode,
+  Copy,
+  RotateCcw,
 } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 
 const records = [
   { title: 'Complete blood count', type: 'Laboratory report', date: 'May 24, 2025', status: 'Ready to review', tone: 'teal' },
@@ -36,14 +40,30 @@ export function HealthDashboard({ name }: { name: string }) {
   const [showAi, setShowAi] = useState(false)
   const [showMessage, setShowMessage] = useState(false)
   const [uploaded, setUploaded] = useState(false)
+  const [emergencyShare, setEmergencyShare] = useState('')
+  const [copied, setCopied] = useState(false)
   const firstName = name.split(' ')[0]
+
+  function createEmergencyShare() {
+    const bytes = new Uint8Array(18)
+    crypto.getRandomValues(bytes)
+    const token = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+    setEmergencyShare(`${window.location.origin}/emergency/${token}`)
+    setCopied(false)
+  }
+
+  async function copyEmergencyShare() {
+    if (!emergencyShare) return
+    await navigator.clipboard.writeText(emergencyShare)
+    setCopied(true)
+  }
 
   return (
     <div className="dashboard-shell grid min-h-[calc(100vh-73px)] bg-[#f8fafc] text-[#123f62] transition-colors duration-500 dark:bg-[#071522] dark:text-slate-100 lg:grid-cols-[230px_1fr]">
       <aside className="hidden border-r border-slate-200 bg-white p-5 lg:block">
         <nav className="flex flex-col gap-1.5" aria-label="Dashboard navigation">
           {[
-            ['Overview', Activity], ['My records', FileText], ['Access & consent', UsersRound], ['Care team', Stethoscope],
+            ['Overview', Activity], ['Emergency Health ID', HeartPulse], ['My records', FileText], ['Access & consent', UsersRound], ['Care team', Stethoscope],
           ].map(([label, Icon]) => <button key={label as string} onClick={() => setActiveSection(label as string)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors ${activeSection === label ? 'bg-[#eaf7f6] text-[#146f6a]' : 'text-slate-500 hover:bg-slate-50'}`}><Icon size={17} />{label as string}</button>)}
         </nav>
         <div className="mt-12 rounded-2xl bg-[#123f62] p-4 text-white"><Sparkles size={18} className="text-[#8fe1d9]" /><p className="mt-3 text-sm font-semibold">Your record assistant</p><p className="mt-2 text-xs leading-5 text-blue-100">Understand your reports in plain language, with facts kept separate from explanations.</p><button onClick={() => setShowAi(true)} className="mt-4 text-xs font-semibold text-[#8fe1d9]">Explain a report <ArrowUpRight className="ml-1 inline" size={13} /></button></div>
@@ -54,7 +74,28 @@ export function HealthDashboard({ name }: { name: string }) {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="text-sm font-medium text-[#109b94]">{activeSection}</p><h1 className="mt-2 text-3xl font-semibold tracking-[-.04em] text-[#123f62] sm:text-4xl">Good morning, {firstName}</h1><p className="mt-2 text-sm text-slate-500">Your health story, organized and in your hands.</p></div><button onClick={() => setShowUpload(true)} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#123f62] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#123f62]/15 hover:-translate-y-0.5"><Upload size={16} /> Upload medical report</button></div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3"><StatCard icon={FileText} value={uploaded ? '13' : '12'} label="Total records" /><StatCard icon={Clock3} value="02" label="Upcoming items" /><StatCard icon={UsersRound} value="03" label="Shared with care team" /></div><div role="alert" className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900"><Clock3 className="mt-0.5 shrink-0 text-amber-600" size={18} /><div><p className="text-sm font-semibold">Last day to complete your wellness test</p><p className="mt-1 text-xs leading-5 text-amber-800">Please submit your test before today ends so your care team can review it on time.</p></div></div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-3"><StatCard icon={FileText} value={uploaded ? '13' : '12'} label="Total records" /><StatCard icon={Clock3} value="02" label="Upcoming items" /><StatCard icon={UsersRound} value="03" label="Shared with care team" /></div>
+
+          <section className="mt-5 rounded-2xl border border-[#b9e5e1] bg-white p-5 sm:p-6" aria-labelledby="emergency-health-id-title">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-xl">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#146f6a]"><HeartPulse size={17} /> Emergency Health ID</div>
+                <h2 id="emergency-health-id-title" className="mt-3 text-xl font-semibold text-[#123f62]">Share only what helps in an emergency.</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Create a temporary QR pass with your selected allergies, medications, blood type, and emergency contacts. Your full health record stays private.</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium text-slate-600"><span className="rounded-full bg-[#e5f6f4] px-2.5 py-1 text-[#146f6a]">User-entered profile</span><span className="rounded-full bg-slate-100 px-2.5 py-1">Verified information is labeled</span><span className="rounded-full bg-slate-100 px-2.5 py-1">Expires automatically</span></div>
+              </div>
+              <div className="flex shrink-0 flex-col items-center rounded-2xl bg-[#f0fbfa] p-4">
+                {emergencyShare ? <QRCodeSVG value={emergencyShare} size={132} bgColor="#f0fbfa" fgColor="#123f62" level="M" aria-label="Temporary Emergency Health ID QR code" /> : <div className="flex size-[132px] items-center justify-center rounded-xl border-2 border-dashed border-[#b9e5e1] text-center text-xs text-[#146f6a]"><QrCode size={22} /><span className="sr-only">QR code not created yet</span></div>}
+                <p className="mt-3 text-center text-[11px] font-medium text-slate-500">{emergencyShare ? 'Temporary access pass' : 'No active pass'}</p>
+              </div>
+            </div>
+            <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs leading-5 text-slate-500">Never use a screenshot or public link as your permanent record. Revoke access by creating a new pass.</p>
+              <div className="flex flex-wrap gap-2"><button onClick={createEmergencyShare} className="inline-flex items-center gap-2 rounded-full bg-[#123f62] px-4 py-2.5 text-xs font-semibold text-white"><RotateCcw size={14} /> {emergencyShare ? 'Create new pass' : 'Create secure pass'}</button>{emergencyShare && <button onClick={copyEmergencyShare} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-xs font-semibold text-[#123f62]"><Copy size={14} /> {copied ? 'Copied' : 'Copy private link'}</button>}</div>
+            </div>
+          </section>
+
+          <div role="alert" className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900"><Clock3 className="mt-0.5 shrink-0 text-amber-600" size={18} /><div><p className="text-sm font-semibold">Last day to complete your wellness test</p><p className="mt-1 text-xs leading-5 text-amber-800">Please submit your test before today ends so your care team can review it on time.</p></div></div>
 
           <div className="mt-8 grid gap-5 xl:grid-cols-[1.35fr_.65fr]">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex items-center justify-between"><div><h2 className="font-semibold text-[#123f62]">Recent records</h2><p className="mt-1 text-xs text-slate-500">Your latest health information</p></div><button className="rounded-lg p-2 text-slate-400 hover:bg-slate-50" aria-label="More record options"><MoreHorizontal size={18} /></button></div><div className="mt-5 flex flex-col gap-2">{records.map((record) => <RecordRow key={record.title} {...record} onExplain={() => setShowAi(true)} />)}{uploaded && <RecordRow title="New medical report" type="Uploaded just now" date="Today" status="Processing" tone="blue" onExplain={() => setShowAi(true)} />}</div><button className="mt-5 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-[#123f62] hover:bg-slate-50">View all records</button></section>
