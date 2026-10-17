@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 
@@ -15,6 +15,8 @@ export function AuthForm() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [pending, setPending] = useState(false)
+  const [language, setLanguage] = useState('en')
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([])
 
   async function sendCode() {
     const response = await fetch('/api/otp/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
@@ -50,6 +52,7 @@ export function AuthForm() {
     {step === 'otp' ? <div className="rounded-2xl border border-[#b9e5e1] bg-[#f0fbfa] p-4"><p className="text-sm font-semibold text-[#123f62]">Check your inbox</p><p className="mt-1 text-xs leading-5 text-slate-600">We sent a secure 6-digit code to {email}.</p></div> : <>
       {mode === 'sign-up' && <fieldset className="flex flex-col gap-2"><legend className="text-sm font-medium text-slate-700">I am registering as</legend><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => setRole('patient')} className={`rounded-xl border px-3 py-3 text-sm font-semibold ${role === 'patient' ? 'border-[#109b94] bg-[#f0fbfa] text-[#146f6a]' : 'border-slate-200 text-slate-500'}`}>Patient</button><button type="button" onClick={() => setRole('doctor')} className={`rounded-xl border px-3 py-3 text-sm font-semibold ${role === 'doctor' ? 'border-[#109b94] bg-[#f0fbfa] text-[#146f6a]' : 'border-slate-200 text-slate-500'}`}>Doctor</button></div>{role === 'doctor' && <p className="text-xs leading-5 text-slate-500">Doctor accounts remain pending until credentials are verified by an administrator.</p>}</fieldset>}
       {mode === 'sign-up' && <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Full name<input required value={name} onChange={(event) => setName(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="name" /></label>}
+      {mode === 'sign-up' && <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Preferred language<select value={language} onChange={(event) => setLanguage(event.target.value)} className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[#109b94] focus:ring-2"><option value="en">English</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option><option value="pt">Português</option><option value="bn">বাংলা</option><option value="zh">中文</option></select><span className="text-xs font-normal text-slate-500">You can change this anytime in settings.</span></label>}
       <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Email<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete="email" /></label>
       <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">Password<input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-slate-200 px-4 py-3 outline-none ring-[#109b94] focus:ring-2" autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'} /></label>
     </>}

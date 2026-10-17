@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import type { Locale } from '@/lib/i18n'
 import {
   Activity, ArrowRight, Check, ChevronDown as ChevronDownIcon, CircleHelp, FileText, HeartPulse, LockKeyhole, Menu, Moon,
   QrCode, Search, ShieldCheck, Sparkles, Stethoscope, Sun, Upload, UserRound, UsersRound, X,
@@ -24,11 +25,12 @@ const questions = {
   'New medication': 'What should I know about this medicine, including side effects and interactions?',
 }
 
-export default function Page({ locale = 'en' }: { locale?: 'en' | 'hi' }) {
+export default function Page({ locale = 'en' }: { locale?: Locale }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
-  const [language, setLanguage] = useState<'English' | 'हिन्दी'>(locale === 'hi' ? 'हिन्दी' : 'English')
-  const hindi = language === 'हिन्दी'
+const languageOptions = [{ code: 'en', label: 'English' }, { code: 'hi', label: 'हिन्दी' }, { code: 'es', label: 'Español' }, { code: 'fr', label: 'Français' }, { code: 'ar', label: 'العربية' }, { code: 'pt', label: 'Português' }, { code: 'bn', label: 'বাংলা' }, { code: 'zh', label: '中文' }] as const
+ const [language, setLanguage] = useState<Locale>(locale)
+ const hindi = language === 'hi'
   const copy = hindi ? {
     mission: 'मिशन', how: 'कैसे काम करता है', doctors: 'डॉक्टरों के लिए', trust: 'विश्वास और गोपनीयता',
     demo: 'डेमो देखें', headline: 'आपकी स्वास्थ्य कहानी, हमेशा आपके साथ।',
@@ -63,7 +65,7 @@ export default function Page({ locale = 'en' }: { locale?: 'en' | 'hi' }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <a href="#top" className="flex items-center gap-2.5" aria-label="LifeHealth ID home"><span className="brand-orb flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground"><HeartPulse size={19} /></span><span className="text-[17px] font-semibold tracking-[-.03em]">LifeHealth <span className="text-secondary-foreground">ID</span></span></a>
           <nav className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">{[[copy.mission, 'mission'], [copy.how, 'how-it-works'], [copy.doctors, 'for-doctors'], [copy.trust, 'trust-&-privacy']].map(([label, href]) => <a key={href} href={`#${href}`} className="hover:text-foreground">{label}</a>)}</nav>
-          <div className="hidden items-center gap-2 sm:flex"><label className="sr-only" htmlFor="language">Language</label><select id="language" value={language} onChange={(e) => setLanguage(e.target.value as typeof language)} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium"><option>English</option><option>हिन्दी</option></select><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:-translate-y-0.5">{copy.demo} <ArrowRight className="ml-1 inline" size={15} /></button></div>
+          <div className="hidden items-center gap-2 sm:flex"><label className="sr-only" htmlFor="language">Language</label><select id="language" value={language} onChange={(e) => { const next = e.target.value as Locale; setLanguage(next); window.location.assign(`/${next}`) }} className="rounded-full border border-border bg-card px-3 py-2 text-xs font-medium">{languageOptions.map((option) => <option key={option.code} value={option.code}>{option.label}</option>)}</select><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 hover:-translate-y-0.5">{copy.demo} <ArrowRight className="ml-1 inline" size={15} /></button></div>
           <div className="flex items-center gap-2 lg:hidden"><button onClick={toggleTheme} className="rounded-full border border-border bg-card p-2.5 text-primary" aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button><button className="rounded-lg p-2" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu size={22} /></button></div>
         </div>
         {menuOpen && <nav className="flex flex-col gap-4 border-t border-border px-5 py-5 text-sm lg:hidden">{['Mission', 'How it works', 'For doctors', 'Trust & privacy'].map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} onClick={() => setMenuOpen(false)}>{item}</a>)}<button onClick={() => setShowDemo(true)} className="rounded-full bg-primary px-4 py-3 font-semibold text-primary-foreground">Try the demo</button></nav>}
