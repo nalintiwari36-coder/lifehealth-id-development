@@ -42,6 +42,8 @@ export function HealthDashboard({ name }: { name: string }) {
   const [uploaded, setUploaded] = useState(false)
   const [emergencyShare, setEmergencyShare] = useState('')
   const [copied, setCopied] = useState(false)
+  const [profile, setProfile] = useState({ bloodGroup: 'O+', allergies: 'Penicillin', medication: 'Metformin 500 mg', contact: '+1 (555) 014-2031' })
+  const [timelineFilter, setTimelineFilter] = useState('All')
   const firstName = name.split(' ')[0]
 
   function createEmergencyShare() {
@@ -97,6 +99,10 @@ export function HealthDashboard({ name }: { name: string }) {
 
           <div role="alert" className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900"><Clock3 className="mt-0.5 shrink-0 text-amber-600" size={18} /><div><p className="text-sm font-semibold">Last day to complete your wellness test</p><p className="mt-1 text-xs leading-5 text-amber-800">Please submit your test before today ends so your care team can review it on time.</p></div></div>
 
+          {activeSection === 'My records' && <TimelinePanel filter={timelineFilter} setFilter={setTimelineFilter} onUpload={() => setShowUpload(true)} />}
+          {activeSection === 'Emergency Health ID' && <EmergencyProfilePanel profile={profile} setProfile={setProfile} />}
+          {activeSection === 'Care team' && <VisitPrepPanel />}
+
           <div className="mt-8 grid gap-5 xl:grid-cols-[1.35fr_.65fr]">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><div className="flex items-center justify-between"><div><h2 className="font-semibold text-[#123f62]">Recent records</h2><p className="mt-1 text-xs text-slate-500">Your latest health information</p></div><button className="rounded-lg p-2 text-slate-400 hover:bg-slate-50" aria-label="More record options"><MoreHorizontal size={18} /></button></div><div className="mt-5 flex flex-col gap-2">{records.map((record) => <RecordRow key={record.title} {...record} onExplain={() => setShowAi(true)} />)}{uploaded && <RecordRow title="New medical report" type="Uploaded just now" date="Today" status="Processing" tone="blue" onExplain={() => setShowAi(true)} />}</div><button className="mt-5 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-[#123f62] hover:bg-slate-50">View all records</button></section>
             <section className="rounded-2xl border border-[#b9e5e1] bg-[#f0fbfa] p-5 sm:p-6"><div className="flex items-center gap-2 text-sm font-semibold text-[#146f6a]"><Sparkles size={17} /> AI report assistant</div><h2 className="mt-5 text-xl font-semibold leading-tight text-[#123f62]">A clearer way to read your results.</h2><p className="mt-3 text-sm leading-6 text-slate-600">Get a plain-language explanation of medical terms and a list of questions to take to your doctor.</p><div className="mt-6 flex items-start gap-3 rounded-xl bg-white/75 p-3.5"><ShieldCheck size={17} className="mt-0.5 shrink-0 text-[#109b94]" /><p className="text-xs leading-5 text-slate-500">Educational only. Not a diagnosis or a substitute for medical care.</p></div><button onClick={() => setShowAi(true)} className="mt-5 rounded-full bg-[#123f62] px-4 py-2.5 text-sm font-semibold text-white">Explain a report</button></section>
@@ -110,6 +116,31 @@ export function HealthDashboard({ name }: { name: string }) {
       {showAi && <Modal title="Report assistant" onClose={() => setShowAi(false)}><div className="rounded-xl bg-[#f0fbfa] p-4"><div className="flex items-center gap-2 text-sm font-semibold text-[#146f6a]"><Sparkles size={16} /> Educational explanation</div><p className="mt-3 text-sm leading-6 text-slate-600">Upload a report to receive a clear summary of the extracted facts, medical terms, and questions to discuss with your doctor. Missing values are never invented.</p></div><div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-800"><strong>Important:</strong> This assistant is not a doctor and cannot diagnose or recommend medication changes. For urgent symptoms, contact local emergency services.</div></Modal>}
     </div>
   )
+}
+
+function TimelinePanel({ filter, setFilter, onUpload }: { filter: string; setFilter: (value: string) => void; onUpload: () => void }) {
+  const events = [
+    ['May 24, 2025', 'Complete blood count', 'Laboratory report', 'Northside Medical'],
+    ['Apr 12, 2025', 'Annual wellness visit', 'Doctor visit', 'Dr. Maya Chen'],
+    ['Jan 08, 2025', 'Lipid panel', 'Laboratory report', 'Northside Medical'],
+    ['Nov 21, 2024', 'Influenza vaccination', 'Vaccination', 'Community Pharmacy'],
+  ]
+  const visible = filter === 'All' ? events : events.filter((event) => event[2] === filter)
+  return <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="timeline-title">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-semibold text-[#146f6a]">Health timeline</p><h2 id="timeline-title" className="mt-1 text-xl font-semibold text-[#123f62]">Your complete health story</h2><p className="mt-1 text-sm text-slate-500">Visits, reports, prescriptions, and vaccinations in one chronological view.</p></div><button onClick={onUpload} className="rounded-full bg-[#123f62] px-4 py-2.5 text-xs font-semibold text-white"><Upload className="mr-1 inline" size={14} /> Add record</button></div>
+    <div className="mt-5 flex flex-wrap gap-2">{['All', 'Laboratory report', 'Doctor visit', 'Vaccination'].map((item) => <button key={item} onClick={() => setFilter(item)} className={`rounded-full px-3 py-2 text-xs font-semibold ${filter === item ? 'bg-[#123f62] text-white' : 'border border-slate-200 text-slate-500'}`}>{item}</button>)}</div>
+    <div className="mt-6 flex flex-col">{visible.map(([date, title, type, source]) => <div key={title} className="relative flex gap-4 border-l-2 border-[#b9e5e1] pb-6 pl-6 last:pb-0"><span className="absolute -left-[7px] top-0 size-3 rounded-full border-2 border-white bg-[#109b94] ring-1 ring-[#b9e5e1]" /><div><p className="text-xs font-medium text-[#109b94]">{date}</p><h3 className="mt-1 text-sm font-semibold text-[#123f62]">{title}</h3><p className="mt-1 text-xs text-slate-500">{type} · {source}</p><button className="mt-2 text-xs font-semibold text-[#146f6a]">Add a note</button></div></div>)}</div>
+  </section>
+}
+
+function EmergencyProfilePanel({ profile, setProfile }: { profile: { bloodGroup: string; allergies: string; medication: string; contact: string }; setProfile: (value: { bloodGroup: string; allergies: string; medication: string; contact: string }) => void }) {
+  const [saved, setSaved] = useState(false)
+  return <section className="mt-6 rounded-2xl border border-[#b9e5e1] bg-white p-5 sm:p-6" aria-labelledby="emergency-profile-title"><div><p className="text-sm font-semibold text-[#146f6a]">Emergency card settings</p><h2 id="emergency-profile-title" className="mt-1 text-xl font-semibold text-[#123f62]">Choose exactly what responders can see</h2><p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Only selected fields appear on your QR card. Your full record is never public, and changes can be saved or disabled at any time.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2">{([['bloodGroup', 'Blood group'], ['allergies', 'Allergies'], ['medication', 'Current medications'], ['contact', 'Emergency contact']] as const).map(([key, label]) => <label key={key} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-medium text-[#123f62]"><input type="checkbox" defaultChecked className="size-4 accent-[#109b94]" />{label}<input aria-label={`${label} value`} value={profile[key]} onChange={(event) => setProfile({ ...profile, [key]: event.target.value })} className="ml-auto min-w-0 flex-1 rounded-lg border border-slate-200 px-2 py-1.5 text-right text-xs" /></label>)}</div><div className="mt-5 flex flex-wrap items-center gap-3"><button onClick={() => setSaved(true)} className="rounded-full bg-[#123f62] px-4 py-2.5 text-xs font-semibold text-white">Save emergency details</button>{saved && <span className="text-xs font-semibold text-[#146f6a]">Saved privately. Your card is ready to generate above.</span>}<p className="w-full text-xs leading-5 text-slate-500">Privacy notice: emergency access is view-only and should contain only information you are comfortable sharing.</p></div></section>
+}
+
+function VisitPrepPanel() {
+  const [reason, setReason] = useState('Annual checkup')
+  return <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="visit-prep-title"><p className="text-sm font-semibold text-[#146f6a]">Doctor visit preparation</p><h2 id="visit-prep-title" className="mt-1 text-xl font-semibold text-[#123f62]">Arrive with the right context</h2><p className="mt-1 text-sm text-slate-500">Create a simple checklist from your recent records, medications, and questions.</p><label className="mt-5 block max-w-md text-xs font-semibold text-slate-500">Reason for visit<select value={reason} onChange={(event) => setReason(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-normal text-[#123f62]"><option>Annual checkup</option><option>Discuss lab results</option><option>New symptom</option><option>Medication review</option></select></label><div className="mt-5 grid gap-3 sm:grid-cols-3">{['Bring current medications', 'Review recent lab results', 'Ask your prepared questions'].map((item) => <label key={item} className="flex gap-2 rounded-xl bg-[#f0fbfa] p-3 text-xs font-medium text-[#146f6a]"><input type="checkbox" className="size-4 accent-[#109b94]" />{item}</label>)}</div><p className="mt-4 text-xs text-slate-500">{reason} · Educational preparation only, not medical advice.</p></section>
 }
 
 function MessageModal({ onClose }: { onClose: () => void }) {
