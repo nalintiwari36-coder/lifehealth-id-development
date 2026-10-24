@@ -78,6 +78,18 @@ export function HealthDashboard({ name }: { name: string }) {
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3"><StatCard icon={FileText} value={uploaded ? '13' : '12'} label="Total records" /><StatCard icon={Clock3} value="02" label="Upcoming items" /><StatCard icon={UsersRound} value="03" label="Shared with care team" /></div>
 
+          <section className="mt-5 grid gap-4 xl:grid-cols-[1.25fr_.75fr]" aria-label="Health profile status and quick actions">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div><p className="text-sm font-semibold text-[#123f62]">Profile completeness</p><p className="mt-1 text-xs leading-5 text-slate-500">A complete profile helps your care team act faster when it matters.</p></div>
+                <span className="text-2xl font-semibold text-[#146f6a]">72%</span>
+              </div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Profile completeness" aria-valuemin={0} aria-valuemax={100} aria-valuenow={72}><div className="h-full w-[72%] rounded-full bg-[#109b94]" /></div>
+              <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-medium"><span className="rounded-full bg-[#e5f6f4] px-2.5 py-1 text-[#146f6a]">Emergency contact added</span><span className="rounded-full bg-amber-50 px-2.5 py-1 text-amber-800">Add date of birth</span><span className="rounded-full bg-amber-50 px-2.5 py-1 text-amber-800">Add care preferences</span></div>
+            </div>
+            <div className="rounded-2xl border border-[#b9e5e1] bg-[#f0fbfa] p-5 sm:p-6"><p className="text-sm font-semibold text-[#123f62]">Quick actions</p><div className="mt-4 grid grid-cols-2 gap-2"><button onClick={() => setShowUpload(true)} className="rounded-xl bg-white px-3 py-3 text-left text-xs font-semibold text-[#123f62] shadow-sm hover:bg-[#e5f6f4]"><Upload size={15} className="mb-2 text-[#109b94]" />Upload record</button><button onClick={() => setActiveSection('Emergency Health ID')} className="rounded-xl bg-white px-3 py-3 text-left text-xs font-semibold text-[#123f62] shadow-sm hover:bg-[#e5f6f4]"><HeartPulse size={15} className="mb-2 text-[#109b94]" />Emergency card</button><button onClick={() => setShowMessage(true)} className="rounded-xl bg-white px-3 py-3 text-left text-xs font-semibold text-[#123f62] shadow-sm hover:bg-[#e5f6f4]"><Mail size={15} className="mb-2 text-[#109b94]" />Message care team</button><button onClick={() => setActiveSection('Care team')} className="rounded-xl bg-white px-3 py-3 text-left text-xs font-semibold text-[#123f62] shadow-sm hover:bg-[#e5f6f4]"><CalendarDays size={15} className="mb-2 text-[#109b94]" />Prepare for visit</button></div></div>
+          </section>
+
           <section className="mt-5 rounded-2xl border border-[#b9e5e1] bg-white p-5 sm:p-6" aria-labelledby="emergency-health-id-title">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
