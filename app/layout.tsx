@@ -3,8 +3,13 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'LifeHealth ID — Your health story, always with you',
-  description: 'A free, nonprofit digital health record platform designed to keep your health story secure, portable, and in your hands.',
+  title: 'LifeHealth ID — Your private health story, always with you',
+  description: 'LifeHealth ID is a free, privacy-first health home for organizing records, preparing for care, and sharing only what matters.',
+  openGraph: {
+    title: 'LifeHealth ID — Your private health story, always with you',
+    description: 'Organize lifelong health records, prepare for visits, and share securely with the people you trust.',
+    type: 'website',
+  },
   generator: 'v0.app',
   icons: {
     icon: [
