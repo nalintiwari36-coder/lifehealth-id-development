@@ -31,7 +31,13 @@ export async function POST(request: Request) {
     }, { idempotencyKey: `otp/${id}` })
     if (error) {
       await db.delete(verification).where(eq(verification.id, id))
-      console.error('[otp] Resend rejected verification email', { name: error.name, statusCode: error.statusCode })
+      console.error('[otp] Resend rejected verification email', {
+        name: error.name,
+        message: error.message,
+        statusCode: error.statusCode,
+        recipient: email,
+        senderDomain: env.RESEND_EMAIL_DOMAIN,
+      })
       return Response.json({ error: 'We could not send the verification email.' }, { status: error.statusCode === 429 ? 429 : 502 })
     }
   } catch (error) {
