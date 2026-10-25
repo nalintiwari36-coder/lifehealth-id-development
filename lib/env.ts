@@ -41,6 +41,7 @@ export const env = {
   OTP_LENGTH: positiveInteger('OTP_LENGTH', process.env.OTP_LENGTH, 6),
   OTP_TTL_SECONDS: positiveInteger('OTP_TTL_SECONDS', process.env.OTP_TTL_SECONDS, 600),
   OTP_MAX_ATTEMPTS: positiveInteger('OTP_MAX_ATTEMPTS', process.env.OTP_MAX_ATTEMPTS, 5),
+  OTP_RESEND_COOLDOWN_SECONDS: positiveInteger('OTP_RESEND_COOLDOWN_SECONDS', process.env.OTP_RESEND_COOLDOWN_SECONDS, 60),
 } as const
 
 export const getPublicEnv = () => ({ BETTER_AUTH_URL: env.BETTER_AUTH_URL })
