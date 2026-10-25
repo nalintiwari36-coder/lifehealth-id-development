@@ -125,7 +125,7 @@ export function HealthDashboard({ name }: { name: string }) {
 
       {showUpload && <Modal title="Upload a medical report" onClose={() => setShowUpload(false)}><div className="rounded-2xl border-2 border-dashed border-[#b9e5e1] bg-[#f0fbfa] p-8 text-center"><Upload className="mx-auto text-[#109b94]" size={28} /><p className="mt-3 text-sm font-semibold text-[#123f62]">Choose a PDF, JPG, or PNG</p><p className="mt-1 text-xs text-slate-500">Maximum file size: 10 MB</p><input aria-label="Medical report file" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; const formData = new FormData(); formData.append('file', file); const response = await fetch('/api/records/upload', { method: 'POST', body: formData }); if (response.ok) { setUploaded(true); setShowUpload(false) } }} className="mt-5 block w-full text-xs text-slate-500 file:mr-3 file:rounded-full file:border-0 file:bg-[#123f62] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white" /></div><p className="mt-4 text-xs leading-5 text-slate-500">Your file stays private. We validate file type and size before processing.</p></Modal>}
       {showMessage && <MessageModal onClose={() => setShowMessage(false)} />}
-      {showAi && <Modal title="Report assistant" onClose={() => setShowAi(false)}><div className="rounded-xl bg-[#f0fbfa] p-4"><div className="flex items-center gap-2 text-sm font-semibold text-[#146f6a]"><Sparkles size={16} /> Educational explanation</div><p className="mt-3 text-sm leading-6 text-slate-600">Upload a report to receive a clear summary of the extracted facts, medical terms, and questions to discuss with your doctor. Missing values are never invented.</p></div><div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-800"><strong>Important:</strong> This assistant is not a doctor and cannot diagnose or recommend medication changes. For urgent symptoms, contact local emergency services.</div></Modal>}
+      {showAi && <ReportAssistant onClose={() => setShowAi(false)} />}
     </div>
   )
 }
@@ -153,6 +153,40 @@ function EmergencyProfilePanel({ profile, setProfile }: { profile: { bloodGroup:
 function VisitPrepPanel() {
   const [reason, setReason] = useState('Annual checkup')
   return <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="visit-prep-title"><p className="text-sm font-semibold text-[#146f6a]">Doctor visit preparation</p><h2 id="visit-prep-title" className="mt-1 text-xl font-semibold text-[#123f62]">Arrive with the right context</h2><p className="mt-1 text-sm text-slate-500">Create a simple checklist from your recent records, medications, and questions.</p><label className="mt-5 block max-w-md text-xs font-semibold text-slate-500">Reason for visit<select value={reason} onChange={(event) => setReason(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-normal text-[#123f62]"><option>Annual checkup</option><option>Discuss lab results</option><option>New symptom</option><option>Medication review</option></select></label><div className="mt-5 grid gap-3 sm:grid-cols-3">{['Bring current medications', 'Review recent lab results', 'Ask your prepared questions'].map((item) => <label key={item} className="flex gap-2 rounded-xl bg-[#f0fbfa] p-3 text-xs font-medium text-[#146f6a]"><input type="checkbox" className="size-4 accent-[#109b94]" />{item}</label>)}</div><p className="mt-4 text-xs text-slate-500">{reason} · Educational preparation only, not medical advice.</p></section>
+}
+
+function ReportAssistant({ onClose }: { onClose: () => void }) {
+  const [reportText, setReportText] = useState('')
+  const [sourceDocument, setSourceDocument] = useState('')
+  const [reportDate, setReportDate] = useState('')
+  const [explanation, setExplanation] = useState('')
+  const [pending, setPending] = useState(false)
+  const [status, setStatus] = useState('')
+
+  async function explain(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setPending(true)
+    setStatus('')
+    setExplanation('')
+    const response = await fetch('/api/ai/explain-report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reportText, sourceDocument, reportDate }) })
+    const result = await response.json().catch(() => null)
+    setPending(false)
+    if (!response.ok) { setStatus(result?.error ?? 'We could not explain this report.'); return }
+    setExplanation(result.explanation)
+  }
+
+  return <Modal title="Report assistant" onClose={onClose}>
+    <div className="rounded-xl bg-[#f0fbfa] p-4"><div className="flex items-center gap-2 text-sm font-semibold text-[#146f6a]"><Sparkles size={16} /> NVIDIA Nemotron explanation</div><p className="mt-2 text-xs leading-5 text-slate-600">Paste text copied from your authorized report. The assistant uses only the text you provide and keeps facts separate from interpretation.</p></div>
+    <form onSubmit={explain} className="mt-4 flex flex-col gap-3">
+      <input value={sourceDocument} onChange={(event) => setSourceDocument(event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm" placeholder="Source document name (optional)" aria-label="Source document name" />
+      <input value={reportDate} onChange={(event) => setReportDate(event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm" placeholder="Report date (optional)" aria-label="Report date" />
+      <textarea required minLength={40} maxLength={24000} value={reportText} onChange={(event) => setReportText(event.target.value)} className="min-h-36 rounded-xl border border-slate-200 px-3 py-2.5 text-sm leading-5" placeholder="Paste report text here, including values, units, and the report's reference ranges..." aria-label="Medical report text" />
+      {status && <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">{status}</p>}
+      <button disabled={pending} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#123f62] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"><Sparkles size={15} />{pending ? 'Reviewing report…' : 'Explain report'}</button>
+    </form>
+    {explanation && <div className="mt-5 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-700 whitespace-pre-wrap"><p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#146f6a]">Generated explanation · {sourceDocument || 'Uploaded report'}{reportDate ? ` · ${reportDate}` : ''}</p>{explanation}</div>}
+    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800"><strong>Important:</strong> Educational only. This assistant is not a doctor, cannot diagnose, and cannot recommend medication changes. For urgent symptoms, contact local emergency services.</div>
+  </Modal>
 }
 
 function MessageModal({ onClose }: { onClose: () => void }) {
