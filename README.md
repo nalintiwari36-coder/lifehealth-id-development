@@ -210,6 +210,29 @@ http://localhost:3000
 
 ---
 
+## NVIDIA Hackathon Readiness
+
+This project targets the Nebius × NVIDIA Global AI Hackathon. The official event guidance reviewed for this implementation requires: (1) use of Nebius Token Factory or Nebius AI Cloud, (2) at least one eligible NVIDIA open-source model, (3) a working demo, (4) a public repository with an open-source license, (5) a demonstration video under three minutes, and (6) feedback on the Nebius and NVIDIA tools. Eligibility, dates, prize restrictions, and final submission instructions must be rechecked against the event's live rules before submission; this repository does not claim eligibility or submission completion.
+
+### Current implementation checklist
+
+- [x] NVIDIA Nemotron is requested through the Vercel AI Gateway model route (`nvidia/nemotron-3-nano-30b-a3b`), not a mock response.
+- [x] Server-side session protection is required before report analysis; audit events record AI requests.
+- [x] The prompt receives the report text and a deterministic source-facts extraction, and instructs the model not to invent values or reference ranges.
+- [x] The UI labels the source document, report date, extracted facts/interpretation boundary, and medical disclaimer.
+- [x] Synthetic fixtures measure extraction accuracy, factual consistency, latency, and malformed-input handling.
+- [ ] Nebius Token Factory deployment/provider configuration and the under-three-minute demo video remain release tasks and are not asserted here.
+
+Run the evaluation suite with `pnpm test`; its metrics are printed from the current test run and are not hardcoded.
+
+### Demonstration path
+
+1. Sign in as a patient and open the protected dashboard.
+2. Upload a supported report through the authenticated upload route, then open the report assistant.
+3. Submit report text containing values, units, and the report's own reference ranges; confirm the response shows the source and model label.
+4. Grant a doctor scoped consent, verify the doctor can access only authorized records, then revoke consent and verify access is denied.
+5. Review audit events and notifications for the upload, explanation, consent grant, access, and revocation actions.
+
 ## 🔒 Privacy & Security
 
 LifeHealth ID is designed around a simple principle:
