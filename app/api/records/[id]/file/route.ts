@@ -1,20 +1,24 @@
 import { get } from '@vercel/blob'
 import { and, eq } from 'drizzle-orm'
-import { requireSession } from '@/lib/authz'
+import { requireApiSession } from '@/lib/consent'
 import { db } from '@/lib/db'
 import { auditEvent, healthRecord } from '@/lib/db/schema'
+import { canAccessRecord } from '@/lib/consent'
 import { randomUUID } from 'node:crypto'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await requireSession()
+  const session = await requireApiSession()
+  if (!session) return Response.json({ error: 'Authentication required.' }, { status: 401 })
   const { id } = await params
+  const access = await canAccessRecord(session.user.id, id)
+  if (!access) return Response.json({ error: 'File unavailable.' }, { status: 404 })
   const [record] = await db
     .select({ id: healthRecord.id, storagePath: healthRecord.storagePath, originalFileName: healthRecord.originalFileName, mimeType: healthRecord.mimeType, status: healthRecord.status })
     .from(healthRecord)
-    .where(and(eq(healthRecord.id, id), eq(healthRecord.userId, session.user.id)))
+    .where(and(eq(healthRecord.id, id), eq(healthRecord.status, 'available')))
     .limit(1)
 
-  if (!record?.storagePath || record.status !== 'available') return Response.json({ error: 'File unavailable.' }, { status: 404 })
+  if (!record?.storagePath) return Response.json({ error: 'File unavailable.' }, { status: 404 })
 
   const result = await get(record.storagePath, {
     access: 'private',

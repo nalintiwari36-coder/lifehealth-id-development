@@ -1,6 +1,6 @@
 import { generateText, gateway } from 'ai'
 import { randomUUID } from 'node:crypto'
-import { requireSession } from '@/lib/authz'
+import { canAccessRecord, requireApiSession } from '@/lib/consent'
 import { db } from '@/lib/db'
 import { auditEvent } from '@/lib/db/schema'
 import { extractReportFacts, factsPrompt } from '@/lib/ai/report-grounding'
@@ -8,8 +8,11 @@ import { extractReportFacts, factsPrompt } from '@/lib/ai/report-grounding'
 const MAX_REPORT_CHARS = 24000
 
 export async function POST(request: Request) {
-  const session = await requireSession()
+  const session = await requireApiSession()
+  if (!session) return Response.json({ error: 'Authentication required.' }, { status: 401 })
   const body = await request.json().catch(() => null)
+  const recordId = typeof body?.recordId === 'string' ? body.recordId : ''
+  if (recordId && !(await canAccessRecord(session.user.id, recordId))) return Response.json({ error: 'You do not have access to this report.' }, { status: 403 })
   const reportText = typeof body?.reportText === 'string' ? body.reportText.trim() : ''
   const sourceDocument = typeof body?.sourceDocument === 'string' ? body.sourceDocument.trim().slice(0, 160) : 'Uploaded report'
   const reportDate = typeof body?.reportDate === 'string' ? body.reportDate.trim().slice(0, 40) : ''
